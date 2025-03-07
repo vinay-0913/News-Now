@@ -28,7 +28,7 @@ html, body {
 }
 
 .dark-theme {
-    --background: url("/dark_theme.jpg");
+    --background: url("/back.jpg");
     --primary: rgb(30,41,59);
     --secondary: #D5DDF0;
     --txt: #fff;
