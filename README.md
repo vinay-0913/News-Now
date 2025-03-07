@@ -24,7 +24,7 @@ These instructions will help you set up the project on your local machine for de
 8. Start the client by running `npm run dev`.
 Make sure you replace with your API key. So when clicking news articles in AllNews section and Top-Headlines section, related news artilces are shown in Recommendation section (If not, relvent new are not found).
 
-## Note - Currently NewsAPI.org only support `us` country news. So in Country Section, other country news are not returning any news articles. 
+### Note - Currently NewsAPI.org only support `us` country news. So in Country Section, other country news are not returning any news articles. 
 
 ## Usage
 
