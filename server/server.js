@@ -40,22 +40,14 @@ async function makeApiRequest(url) {
 app.get("/all-news", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
   let page = parseInt(req.query.page) || 1;
-  let q = req.query.q || 'world';
+  let q = req.query.q || "world";
 
-  let url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
+  let url = `https://newsapi.org/v2/top-headlines?page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
   const result = await makeApiRequest(url);
-
-  if (result.success && result.data.articles) {
-    // Sort by latest published date
-    let uniqueArticles = Array.from(
-      new Map(result.data.articles.map((a) => [a.url, a])).values()
-    ).sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-
-    result.data.articles = uniqueArticles;
-  }
 
   res.status(result.status).json(result);
 });
+
 
 
 // ✅ Fetch latest top headlines
