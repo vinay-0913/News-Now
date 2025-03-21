@@ -26,7 +26,7 @@ function Card(props) {
   const placeholderImage = "/placeholder.svg";
 
   return (
-    <div className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all mt-10">
+    <div className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 transition-all mt-10 transform hover:-translate-y-0.5 hover:shadow-lg">
       {/* Image Section */}
       <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
         {props.imgUrl && !imageError ? (
@@ -50,9 +50,9 @@ function Card(props) {
 
         {/* Source Badge */}
         {props.source && (
-        <div className="absolute top-2 left-2 bg-white text-black !important text-xs font-semibold px-3 py-1 rounded-md shadow-lg bg-opacity-95">
-        {props.source}
-        </div>
+          <div className="absolute top-2 left-2 bg-white text-black text-xs font-semibold px-3 py-1 rounded-md shadow-lg bg-opacity-95">
+            {props.source}
+          </div>
         )}
       </div>
 
@@ -80,9 +80,12 @@ function Card(props) {
 
         {/* Read More below description */}
         <div className="mt-4">
-          <a href={props.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
-            Read More <ArrowUpRight className="w-4 h-4" />
-          </a>
+        <a href={props.url} target="_blank" rel="noopener noreferrer" 
+          className="flex items-center gap-1 text-blue-600 hover:underline transition-all duration-500 ease-in-out">
+          Read More 
+          <ArrowUpRight className="w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </a>
+
         </div>
       </div>
     </div>
