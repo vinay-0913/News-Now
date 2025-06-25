@@ -17,9 +17,8 @@ These instructions will help you set up the project on your local machine for de
 2. Clone the repository to your local machine.
 3. Navigate to the server directory and create a new file named `.env`.
 4. Add your NewsAPI.org API key to the `.env` file in the following format: `API_KEY=your_news_api_key`.
-5. In the server directory, run `npm install` to install the necessary dependencies.
-6. In the server directory, run `.venv\Scripts\activate` to activate (.venv). And then run python `app.py`.
-6. Start the server by running `node server.js`.
+5. In the client directory, run `npm install` to install the necessary dependencies.
+6. In the server directory, create python virtual environment by running `python -m venv venv` and then run `.venv\Scripts\activate` to activate (.venv). And then run `python app.py`.
 7. Navigate to the client directory and run `npm install` to install the necessary dependencies.
 8. Start the client by running `npm run dev`.
 Make sure you replace with your API key. So when clicking news articles in AllNews section and Top-Headlines section, related news artilces are shown in Recommendation section (If not, relvent new are not found).
