@@ -7,7 +7,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: '*', // Be cautious with this in production
+  origin: '*', 
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -23,7 +23,9 @@ async function makeApiRequest(url) {
       status: 200,
       success: true,
       message: "Successfully fetched the data",
-      data: response.data.articles || [], // Ensure only articles are returned
+      data: response.data.results || [], // NewsData.io returns `results`
+      nextPage: response.data.nextPage || null,
+      totalResults: response.data.totalResults || 0
     };
   } catch (error) {
     console.error("API request error:", error.response ? error.response.data : error);
@@ -36,38 +38,48 @@ async function makeApiRequest(url) {
   }
 }
 
-// ✅ Fetch latest news articles sorted by `publishedAt`
+// ✅ Fetch latest news
 app.get("/all-news", async (req, res) => {
-  let pageSize = parseInt(req.query.pageSize) || 80;
-  let page = parseInt(req.query.page) || 1;
+  let size = parseInt(req.query.size) || 10; // Max 10 for free plan
+  let page = req.query.page || "";
   let q = req.query.q || "world";
 
-  let url = `https://newsapi.org/v2/top-headlines?page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
-  const result = await makeApiRequest(url);
+  let url = `https://newsdata.io/api/1/latest?apikey=${process.env.API_KEY}&q=${encodeURIComponent(q)}&language=en&size=${size}`;
+  if (page) url += `&page=${page}`;
 
+  const result = await makeApiRequest(url);
+  res.status(result.status).json(result);
+});
+
+// ✅ Fetch latest top headlines (category-based, optionally country-specific)
+app.get("/category/:category", async (req, res) => {
+  let size = parseInt(req.query.size) || 10;
+  const category = req.params.category;
+  const page = req.query.page || ""; 
+  const country = req.query.country ? req.query.country.toLowerCase() : null; // optional
+
+  // Build API URL
+  let url = `https://newsdata.io/api/1/latest?apikey=${process.env.API_KEY}&category=${category}&language=en&size=${size}`;
+  if (country) url += `&country=${country}`;
+  if (page) url += `&page=${page}`;
+
+  const result = await makeApiRequest(url);
   res.status(result.status).json(result);
 });
 
 
 
-// ✅ Fetch latest top headlines
-app.get("/top-headlines", async (req, res) => {
-  let pageSize = parseInt(req.query.pageSize) || 50;
-  let page = parseInt(req.query.page) || 1;
-  let category = req.query.category || "general";
 
-  let url = `https://newsapi.org/v2/top-headlines?category=${category}&language=en&sortBy=publishedAt&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
-  const result = await makeApiRequest(url);
-  res.status(result.status).json(result);
-});
 
-// ✅ Fetch country-specific news with latest updates
+// ✅ Fetch country-specific news
 app.get("/country/:iso", async (req, res) => {
-  let pageSize = parseInt(req.query.pageSize) || 50;
-  let page = parseInt(req.query.page) || 1;
-  const country = req.params.iso;
+  let size = parseInt(req.query.size) || 10;
+  let page = req.query.page || "";
+  const country = req.params.iso.toLowerCase();
 
-  let url = `https://newsapi.org/v2/top-headlines?country=${country}&sortBy=publishedAt&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
+  let url = `https://newsdata.io/api/1/news?apikey=${process.env.API_KEY}&country=${country}&language=en&size=${size}`;
+  if (page) url += `&page=${page}`;
+
   const result = await makeApiRequest(url);
   res.status(result.status).json(result);
 });

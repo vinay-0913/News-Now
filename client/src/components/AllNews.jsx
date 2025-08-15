@@ -5,48 +5,68 @@ import axios from "axios";
 
 function AllNews({ onRecommendationsUpdate }) {
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
+  const [pageToken, setPageToken] = useState(""); // NewsData.io pagination token
   const [totalResults, setTotalResults] = useState(0);
+  const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // ✅ New state for load more
   const [error, setError] = useState(null);
 
-  const pageSize = 12;
+  const pageSize = 9; // NewsData.io free tier max
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+  // Fetch initial news
   useEffect(() => {
-    setData([]); // Reset old data before fetching
-    setIsLoading(true);
+    fetchNews(false);
+  }, []);
+
+  const fetchNews = async (loadMore = false) => {
+    if (loadMore) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
-  
-    const fetchNews = async () => {
-      try {
-        const response = await fetch(
-          `https://news-aggregator-dusky.vercel.app/all-news?page=${page}&pageSize=${pageSize}`
-        );
-  
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-  
-        const myJson = await response.json();
-  
-        if (myJson.success) {
-          let latestArticles = myJson.data.articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-          setTotalResults(myJson.data.totalResults);
-          setData(latestArticles);
-        } else {
-          throw new Error(myJson.message || "An error occurred");
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        setError("Failed to fetch news. Please try again later.");
-      } finally {
-        setIsLoading(false);
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/all-news?size=${pageSize}${loadMore && pageToken ? `&page=${pageToken}` : ""}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    };
-  
-    fetchNews();
-  }, [page]);
-  
+
+      const myJson = await response.json();
+
+      if (myJson.success) {
+        let latestArticles = myJson.data.sort(
+          (a, b) => new Date(b.pubDate) - new Date(a.pubDate)
+        );
+
+        setTotalResults(myJson.totalResults || 0);
+
+        if (loadMore) {
+          // Append new articles
+          setData((prev) => [...prev, ...latestArticles]);
+        } else {
+          // Replace with first page
+          setData(latestArticles);
+        }
+
+        setNextPageToken(myJson.nextPage || null);
+        setPageToken(myJson.nextPage || "");
+      } else {
+        throw new Error(myJson.message || "An error occurred");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setError("Failed to fetch news. Please try again later.");
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  };
 
   const fetchRecommendations = async (article) => {
     if (!article.title || article.title.trim() === "") {
@@ -56,10 +76,9 @@ function AllNews({ onRecommendationsUpdate }) {
 
     const payload = {
       title: article.title.trim(),
-      description: article.description || "" // Include description if available
+      description: article.description || "",
+      clicked_urls: [article.link] // NewsData.io uses `link` for URL
     };
-
-    console.log("🔵 Sending payload:", payload);
 
     try {
       const response = await axios.post("http://127.0.0.1:5000/recommend", payload);
@@ -67,7 +86,9 @@ function AllNews({ onRecommendationsUpdate }) {
 
       onRecommendationsUpdate((prevRecommendations) => {
         const updatedRecommendations = [...newRecommendations, ...prevRecommendations];
-        const uniqueRecommendations = Array.from(new Map(updatedRecommendations.map((a) => [a.url, a])).values());
+        const uniqueRecommendations = Array.from(
+          new Map(updatedRecommendations.map((a) => [a.link, a])).values()
+        );
         return uniqueRecommendations;
       });
     } catch (error) {
@@ -80,20 +101,20 @@ function AllNews({ onRecommendationsUpdate }) {
 
   return (
     <>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && <div className="text-red-500 mb-10">{error}</div>}
 
-      <div className="my-10 cards grid lg:place-content-center md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xs:grid-cols-1 xs:gap-4 md:gap-10 lg:gap-14 md:px-16 xs:p-3">
+      <div className="my-24 cards grid lg:place-content-center md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xs:grid-cols-1 xs:gap-4 md:gap-10 lg:gap-14 md:px-16 xs:p-3">
         {!isLoading ? (
           data.map((article, index) => (
             <div key={index} onClick={() => fetchRecommendations(article)} className="cursor-pointer">
               <EverythingCard
                 title={article.title}
                 description={article.description}
-                imgUrl={article.urlToImage}
-                publishedAt={article.publishedAt}
-                url={article.url}
-                author={article.author}
-                source={article.source.name}
+                imgUrl={article.image_url}
+                publishedAt={article.pubDate}
+                url={article.link}
+                author={article.creator ? article.creator.join(", ") : "Unknown"}
+                source={article.source_id || "Unknown"}
               />
             </div>
           ))
@@ -102,16 +123,15 @@ function AllNews({ onRecommendationsUpdate }) {
         )}
       </div>
 
-      {!isLoading && data.length > 0 && (
-        <div className="pagination flex justify-center gap-14 my-10 items-center">
-          <button disabled={page <= 1} className="pagination-btn text-center" onClick={() => setPage(page - 1)}>
-            &larr; Prev
-          </button>
-          <p className="font-semibold opacity-80">
-            {page} of {Math.ceil(totalResults / pageSize)}
-          </p>
-          <button className="pagination-btn text-center" disabled={page >= Math.ceil(totalResults / pageSize)} onClick={() => setPage(page + 1)}>
-            Next &rarr;
+      {/* Load More Button */}
+      {!isLoading && nextPageToken && (
+        <div className="flex justify-center my-10">
+          <button
+            className="pagination-btn hover:bg-blue-600 text-center"
+            onClick={() => fetchNews(true)}
+            disabled={isLoadingMore}
+          >
+            {isLoadingMore ? "Loading..." : "Load More"}
           </button>
         </div>
       )}

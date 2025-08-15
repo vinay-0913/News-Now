@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Prata&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,11 +7,21 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: var(--txt);
-
-    
+    font-family: "Lato", sans-serif;
+    font-weight: 400; 
+    font-style: normal;
 }
 
+body {
+  color: var(--txt); 
+}
+
+.title {
+    font-family: "Lora", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
 
 
 html, body {
@@ -47,7 +58,7 @@ html, body {
     --secondary: #D5DDF0;
     --txt: #fff;
     --heading: #0b31f0f6;
-    --btn-color: #000;
+    --btn-color: #edeef4;
     --btn-background: #edeef4;
     --search-background: #18181b;
 }
@@ -64,10 +75,9 @@ body {
     width: 100% !important;
 }
 
+
 nav {
     height: 70px;
-    backdrop-filter: blur(4px);
-    border-bottom: 0.1px solid grey;
 }
 
 .heading {
@@ -264,11 +274,7 @@ ul li ul li a:hover {
     border-radius: 10px;
 }
 
-.title {
-    font-family: "Freeman", sans-serif;
-    font-weight: 400;
-    font-size: 22px;
-}
+
 
 footer {
     color: var(--btn-color);
@@ -280,32 +286,6 @@ footer {
     height: 100vh;
     padding: 0; 
     align-items: center;
-}
-
-.loader {
-    width: 50px;
-    aspect-ratio: 1;
-    display: grid;
-    color: var(--heading);
-    background: radial-gradient(farthest-side, currentColor calc(100% - 6px), #0000 calc(100% - 5px) 0);
-    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 13px), #000 calc(100% - 12px));
-    border-radius: 50%;
-    animation: l19 2s infinite linear;
-}
-
-.loader::before,
-.loader::after {    
-    content: "";
-    grid-area: 1/1;
-    background:
-        linear-gradient(currentColor 0 0) center,
-        linear-gradient(currentColor 0 0) center;
-    background-size: 100% 10px, 10px 100%;
-    background-repeat: no-repeat;
-}
-
-.loader::after {
-    transform: rotate(45deg);
 }
 
 @keyframes l19 { 

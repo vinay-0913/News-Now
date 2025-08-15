@@ -1,11 +1,12 @@
-import React from 'react'
-function Loader() {
-  return (
-    <div className='loader-container w-full absolute flex justify-center top-0 left-0'>
-        {/* <img className='loader w-1/2' src={loader} alt="loader" /> */}
-        <span className="loader"></span>
-    </div>
-  )
-}
 
-export default Loader
+import React from 'react';
+import { ProgressSpinner } from 'primereact/progressspinner';
+
+export default function Loader() {
+    return (
+        <div className=" loader-container w-full absolute justify-center top-0 left-0 card flex justify-content-center">
+            <ProgressSpinner />
+        </div>
+    );
+}
+        
