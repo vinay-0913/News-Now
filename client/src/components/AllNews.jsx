@@ -82,7 +82,7 @@ function AllNews({ onRecommendationsUpdate }) {
     };
 
     try {
-      const response = await axios.post(`${RECOMMEND_BASE}/recommend`);
+      const response = await axios.post(`${RECOMMEND_BASE}/recommend`, payload);
       const newRecommendations = response.data?.articles || [];
 
       onRecommendationsUpdate((prevRecommendations) => {
