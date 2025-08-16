@@ -16,6 +16,7 @@ function Category({country, onRecommendationsUpdate }) {
 
   const pageSize = 9;
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
+  const RECOMMEND_BASE = import.meta.env.VITE_RECOMMEND_BASE_URL; 
 
   // Fetch initial or paginated articles
   useEffect(() => {
@@ -73,7 +74,7 @@ function Category({country, onRecommendationsUpdate }) {
     };
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/recommend", payload);
+      const response = await axios.post(`${RECOMMEND_BASE}/recommend`, payload);
       const newRecommendations = response.data?.articles || [];
 
       onRecommendationsUpdate((prevRecommendations) => {
