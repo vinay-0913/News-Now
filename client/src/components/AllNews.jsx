@@ -14,7 +14,8 @@ function AllNews({ onRecommendationsUpdate }) {
 
   const pageSize = 9; // NewsData.io free tier max
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+  const RECOMMEND_BASE = import.meta.env.VITE_RECOMMEND_BASE_URL;
+  
   // Fetch initial news
   useEffect(() => {
     fetchNews(false);
@@ -81,7 +82,7 @@ function AllNews({ onRecommendationsUpdate }) {
     };
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/recommend", payload);
+      const response = await axios.post(`${RECOMMEND_BASE}/recommend`);
       const newRecommendations = response.data?.articles || [];
 
       onRecommendationsUpdate((prevRecommendations) => {
