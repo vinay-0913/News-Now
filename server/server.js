@@ -38,6 +38,10 @@ async function makeApiRequest(url) {
   }
 }
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
 // ✅ Fetch latest news
 app.get("/all-news", async (req, res) => {
   let size = parseInt(req.query.size) || 10; // Max 10 for free plan
