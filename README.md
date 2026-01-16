@@ -2,7 +2,7 @@
 
 This is a news aggregator project built using the MERN stack (MongoDB, Express, React, Node.js), Flask and the NewsAPI.org API. The project allows users to view news articles from various sources.
 
-#Live Link 
+# Live Link
 Live : https://news-now-nine.vercel.app/
 
 ## Getting Started
